@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import requests
 from bs4 import BeautifulSoup as bs
 import random
@@ -21,12 +22,19 @@ def parser_jokes(url):
     anekdots = soup.find_all('div', class_='text')
     return [item.text for item in anekdots]
 
-def parser_weather(city):
+def parser_weather(city, message):
     try:
         request_web = requests.get("http://api.openweathermap.org/data/2.5/weather",
                     params={'q': city, 'type': 'like', 'units': 'metric', 'lang': 'ru', 'APPID': APPID})
-        data = request_web.json()
-        return data
+        data_temp = request_web.json()
+        print(data_temp)
+        bot.send_message(message.chat.id, '\t\t\t' + str(data_temp['name'])+ ' - ' +
+                                          str(data_temp['weather'][0]['description'])+ '\n' +
+                                          'Скорость ветра: ' + str(data_temp['wind']['speed']) + ' м/с' + '\n' +
+                                          'Облачность: ' + str(data_temp['clouds']['all']) + '%' + '\n'+
+                                          'Температура сейчас: ' + str(data_temp['main']['temp'] )+ '°C'+ '\n' +
+                                          'Минимальная температура: ' + str(data_temp['main']['temp_min'] )+ '°C'+ '\n' +
+                                          'Максимальная температура: ' + str(data_temp['main']['temp_max'] )+ '°C')
     except Exception as e:
         print("Exception (find):", e)
         pass
@@ -64,31 +72,14 @@ def jokes(message):
 
 
     elif message.text.strip() == 'Москва': 
-        request_web = requests.get("http://api.openweathermap.org/data/2.5/weather",
-                    params={'q': 'Moscow,RU', 'type': 'like', 'units': 'metric', 'lang': 'ru', 'APPID': APPID})
-        data_temp = request_web.json()
-        bot.send_message(message.chat.id, '\t\t\t' + str(data_temp['name'])+ '\n' +
-                                          'Температура сейчас: ' + str(data_temp['main']['temp'] )+ '°C'+ '\n' +
-                                          'Минимальная температура: ' + str(data_temp['main']['temp_min'] )+ '°C'+ '\n' +
-                                          'Максимальная температура: ' + str(data_temp['main']['temp_max'] )+ '°C')
+        parser_weather('Moscow,RU', message)
     
     elif message.text.strip() == 'Санкт-Петербург': 
-        request_web = requests.get("http://api.openweathermap.org/data/2.5/weather",
-                    params={'q': 'Saint Petersburg,RU', 'type': 'like', 'units': 'metric', 'lang': 'ru', 'APPID': APPID})
-        data_temp = request_web.json()
-        bot.send_message(message.chat.id, '\t\t\t' + str(data_temp['name'])+ '\n' +
-                                          'Температура сейчас: ' + str(data_temp['main']['temp'] )+ '°C'+ '\n' +
-                                          'Минимальная температура: ' + str(data_temp['main']['temp_min'] )+ '°C'+ '\n' +
-                                          'Максимальная температура: ' + str(data_temp['main']['temp_max'] )+ '°C')
+        parser_weather('Saint Petersburg,RU', message)
 
     elif message.text.strip() == 'Астрахань': 
-        request_web = requests.get("http://api.openweathermap.org/data/2.5/weather",
-                    params={'q': 'Astrakhan,RU', 'type': 'like', 'units': 'metric', 'lang': 'ru', 'APPID': APPID})
-        data_temp = request_web.json()
-        bot.send_message(message.chat.id, '\t\t\t' + str(data_temp['name'])+ '\n' +
-                                          'Температура сейчас: ' + str(data_temp['main']['temp'] )+ '°C'+ '\n' +
-                                          'Минимальная температура: ' + str(data_temp['main']['temp_min'] )+ '°C'+ '\n' +
-                                          'Максимальная температура: ' + str(data_temp['main']['temp_max'] )+ '°C')
+        parser_weather('Astrakhan,RU', message)
+
 
     elif message.text.strip() == 'Назад':
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
